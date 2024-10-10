@@ -3,19 +3,29 @@ const { addNote, getAllNotes, getNoteById } = require('./notes');
 
 // Handler untuk menambahkan catatan
 const addNoteHandler = (request, h) => {
-    const { title, tags, body } = request.payload;
-    const noteId = addNote(title, tags, body);
+  try {
+      const { title, tags, body } = request.payload;
+      const noteId = addNote(title, tags, body);
 
-    const response = h.response({
-        status: 'success',
-        message: 'Catatan berhasil ditambahkan',
-        data: {
-            noteId,
-        },
-    });
-    response.code(201);
-    return response;
+      const response = h.response({
+          status: 'success',
+          message: 'Catatan berhasil ditambahkan',
+          data: {
+              noteId,
+          },
+      });
+      response.code(201);
+      return response;
+  } catch (error) {
+      const response = h.response({
+          status: 'fail',
+          message: 'Terjadi kesalahan pada server',
+      });
+      response.code(500);
+      return response;
+  }
 };
+
 
 // Handler untuk menampilkan semua catatan
 const getAllNotesHandler = (request, h) => {
