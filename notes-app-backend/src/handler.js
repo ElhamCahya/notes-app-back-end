@@ -22,6 +22,7 @@ const getAllNotesHandler = (request, h) => {
     const notes = getAllNotes();
     const response = h.response({
         status: 'success',
+        message: 'Selamat datang di notes',
         data: {
             notes,
         },
