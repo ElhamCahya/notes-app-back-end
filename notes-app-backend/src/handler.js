@@ -1,37 +1,59 @@
-const { nanoid } = require("nanoid");
-const notes = require("./notes");
+const { nanoid } = require('nanoid');
+const { addNote, getAllNotes, getNoteById } = require('./notes');
 
+// Handler untuk menambahkan catatan
 const addNoteHandler = (request, h) => {
     const { title, tags, body } = request.payload;
-    const id = nanoid(16);
-    const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
+    const noteId = addNote(title, tags, body);
 
-    const newNote = {
-        title, tags, body, id, createdAt, updatedAt,
-    };
-
-    notes.push(newNote);
-
-    const isSuccess = notes.filter((note) => note.id === id).length > 0;
-    if (isSuccess) {
-        const response = h.response({
-          status: 'success',
-          message: 'Catatan berhasil ditambahkan. Halo, selamat datang di server!',  // Tambahkan pesan di sini
-          data: {
-            noteId: id,
-          },
-        });
-        response.code(201); // Set response code 201 untuk sukses
-        return response;
-    }
-    
     const response = h.response({
-        status: 'fail',
-        message: 'Catatan gagal ditambahkan',
+        status: 'success',
+        message: 'Catatan berhasil ditambahkan',
+        data: {
+            noteId,
+        },
     });
-    response.code(500); // Set response code 500 untuk kegagalan
+    response.code(201);
     return response;
 };
 
-module.exports = { addNoteHandler };
+// Handler untuk menampilkan semua catatan
+const getAllNotesHandler = (request, h) => {
+    const notes = getAllNotes();
+    const response = h.response({
+        status: 'success',
+        data: {
+            notes,
+        },
+    });
+    response.code(200);
+    return response;
+};
+
+// Handler untuk mendapatkan catatan berdasarkan ID
+const getNoteByIdHandler = (request, h) => {
+    const { id } = request.params;
+    const note = getNoteById(id);
+
+    if (note) {
+        return {
+            status: 'success',
+            data: {
+                note,
+            },
+        };
+    }
+
+    const response = h.response({
+        status: 'fail',
+        message: 'Catatan tidak ditemukan',
+    });
+    response.code(404);
+    return response;
+};
+
+module.exports = {
+    addNoteHandler,
+    getAllNotesHandler,
+    getNoteByIdHandler,
+};
