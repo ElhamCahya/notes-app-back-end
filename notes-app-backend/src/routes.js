@@ -6,6 +6,15 @@ const routes = [
     path: '/notes',
     handler: addNoteHandler,
   },
+  {
+    method: 'GET',
+    path: '/',
+    handler: (request, h) => {
+      return h.response({
+        message: 'Halo, selamat datang di server!'
+      }).code(200);
+    },
+  },
 ];
 
 module.exports = routes;
