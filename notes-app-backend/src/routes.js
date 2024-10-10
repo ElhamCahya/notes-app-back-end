@@ -11,7 +11,7 @@ const routes = [
     path: '/',
     handler: (request, h) => {
       return h.response({
-        message: 'Halo, selamat datang di server!'
+        message: 'Halo, selamat datang di server by Elham Cahya Rahmadani!'
       }).code(200);
     },
   },
