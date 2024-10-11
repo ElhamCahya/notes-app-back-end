@@ -1,5 +1,4 @@
-const { nanoid } = require('nanoid');
-const { addNote, getAllNotes, getNoteById } = require('./notes');
+const { addNote, getAllNotes, getNoteById, deleteNoteById, updateNoteById,  } = require('./notes');
 
 // Handler untuk menambahkan catatan
 const addNoteHandler = (request, h) => {
@@ -7,64 +6,123 @@ const addNoteHandler = (request, h) => {
       const { title, tags, body } = request.payload;
       const noteId = addNote(title, tags, body);
 
-      const response = h.response({
+      return h.response({
           status: 'success',
           message: 'Catatan berhasil ditambahkan',
-          data: {
-              noteId,
-          },
-      });
-      response.code(201);
-      return response;
+          data: { noteId },
+      }).code(201);
   } catch (error) {
-      const response = h.response({
+      console.error(error); // Log error untuk debugging
+      return h.response({
           status: 'fail',
           message: 'Terjadi kesalahan pada server',
-      });
-      response.code(500);
-      return response;
+      }).code(500);
   }
 };
 
-
 // Handler untuk menampilkan semua catatan
 const getAllNotesHandler = (request, h) => {
-    const notes = getAllNotes();
-    const response = h.response({
-        status: 'success',
-        message: 'Selamat datang di notes',
-        data: {
-            notes,
-        },
-    });
-    response.code(200);
-    return response;
+    try {
+        const notes = getAllNotes();
+        return h.response({
+            status: 'success',
+            message: 'Selamat datang di notes',
+            data: { notes },
+        }).code(200);
+    } catch (error) {
+        console.error(error); // Log error untuk debugging
+        return h.response({
+            status: 'fail',
+            message: 'Terjadi kesalahan pada server',
+        }).code(500);
+    }
 };
 
 // Handler untuk mendapatkan catatan berdasarkan ID
 const getNoteByIdHandler = (request, h) => {
-    const { id } = request.params;
-    const note = getNoteById(id);
+    try {
+        const { id } = request.params;
+        const note = getNoteById(id);
 
-    if (note) {
-        return {
-            status: 'success',
-            data: {
-                note,
-            },
-        };
+        if (note) {
+            return h.response({
+                status: 'success',
+                data: { note },
+            }).code(200);
+        }
+
+        return h.response({
+            status: 'fail',
+            message: 'Catatan tidak ditemukan',
+        }).code(404);
+    } catch (error) {
+        console.error(error); // Log error untuk debugging
+        return h.response({
+            status: 'fail',
+            message: 'Terjadi kesalahan pada server',
+        }).code(500);
     }
+};
 
-    const response = h.response({
-        status: 'fail',
-        message: 'Catatan tidak ditemukan',
-    });
-    response.code(404);
-    return response;
+// Handler untuk memperbarui catatan berdasarkan ID
+const editNoteByIdHandler = (request, h) => {
+    try {
+        const { id } = request.params;
+        const { title, tags, body } = request.payload;
+        const updatedAt = new Date().toISOString();
+
+        const isUpdated = updateNoteById(id, { title, tags, body, updatedAt });
+
+        if (isUpdated) {
+            return h.response({
+                status: 'success',
+                message: 'Catatan berhasil diperbarui',
+            }).code(200);
+        }
+
+        return h.response({
+            status: 'fail',
+            message: 'Gagal memperbarui catatan. ID tidak ditemukan',
+        }).code(404);
+    } catch (error) {
+        console.error(error); // Log error untuk debugging
+        return h.response({
+            status: 'fail',
+            message: 'Terjadi kesalahan pada server',
+        }).code(500);
+    }
+};
+
+// Handler untuk menghapus catatan berdasarkan ID
+const deleteNoteByIdHandler = (request, h) => {
+    try {
+        const { id } = request.params;
+        const isDeleted = deleteNoteById(id);
+
+        if (isDeleted) {
+            return h.response({
+                status: 'success',
+                message: 'Catatan berhasil dihapus',
+            }).code(200);
+        }
+
+        return h.response({
+            status: 'fail',
+            message: 'Gagal menghapus catatan. ID tidak ditemukan',
+        }).code(404);
+    } catch (error) {
+        console.error(error); // Log error untuk debugging
+        return h.response({
+            status: 'fail',
+            message: 'Terjadi kesalahan pada server',
+        }).code(500);
+    }
 };
 
 module.exports = {
     addNoteHandler,
     getAllNotesHandler,
     getNoteByIdHandler,
+    editNoteByIdHandler,
+    deleteNoteByIdHandler,  // Handler untuk DELETE
 };

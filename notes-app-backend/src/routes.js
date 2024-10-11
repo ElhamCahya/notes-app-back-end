@@ -1,4 +1,4 @@
-const { addNoteHandler, getAllNotesHandler } = require("./handler");
+const { addNoteHandler, getAllNotesHandler, getNoteByIdHandler, editNoteByIdHandler, deleteNoteByIdHandler } = require('./handler');
 
 const routes = [
   {
@@ -8,17 +8,23 @@ const routes = [
   },
   {
     method: 'GET',
-    path: '/',
-    handler: (request, h) => {
-      return h.response({
-        message: 'Halo, selamat datang di server by Elham Cahya Rahmadani!'
-      }).code(200);
-    },
+    path: '/notes',
+    handler: getAllNotesHandler, // Route untuk mendapatkan semua catatan
   },
   {
     method: 'GET',
-    path: '/notes',
-    handler: getAllNotesHandler, // Tambahkan route untuk mendapatkan semua catatan
+    path: '/notes/{id}', // Route untuk mendapatkan catatan berdasarkan ID
+    handler: getNoteByIdHandler, // Handler untuk mendapatkan catatan berdasarkan ID
+  },
+  {
+    method: 'PUT',
+    path: '/notes/{id}', // Route untuk mengubah catatan berdasarkan ID
+    handler: editNoteByIdHandler, // Handler untuk mengubah catatan
+  },
+  {
+    method: 'DELETE',
+    path: '/notes/{id}',
+    handler: deleteNoteByIdHandler
   },
 ];
 
